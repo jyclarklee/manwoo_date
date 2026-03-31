@@ -1,147 +1,211 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>나랑 닮은 디즈니 캐릭터는?</title>
-<style>
-/* 전반적인 스타일 정의 */
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#f5f5f5;color:#111;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;}
-.wrap{max-width:560px;width:100%;background:#fff;border-radius:16px;padding:2rem;box-shadow:0 2px 16px rgba(0,0,0,.07);}
-.title{font-size:26px;font-weight:700;color:#111;text-align:center;margin-bottom:6px;}
-.subtitle{font-size:14px;color:#888;text-align:center;margin-bottom:1.75rem;}
-.prog-bar{height:4px;background:#e5e5e5;border-radius:2px;margin-bottom:2rem;}
-.prog-fill{height:4px;background:#7F77DD;border-radius:2px;transition:width 0.4s ease;}
-.q-label{font-size:12px;color:#888;margin-bottom:8px;}
-.q-text{font-size:18px;font-weight:600;color:#111;margin-bottom:1.5rem;line-height:1.5;}
-.options{display:grid;gap:10px;}
-.opt-btn{background:#fff;border:1px solid #ddd;border-radius:12px;padding:14px 18px;text-align:left;font-size:15px;color:#222;cursor:pointer;transition:background 0.15s,border-color 0.15s;line-height:1.5;font-family:inherit;}
-.opt-btn:hover{background:#f3f2ff;border-color:#7F77DD;}
-.back-btn{font-size:13px;color:#aaa;background:none;border:none;cursor:pointer;padding:0;font-family:inherit;}
-.back-btn:hover{color:#555;}
-.result-card{background:#fff;border:1px solid #eee;border-radius:16px;padding:2rem;text-align:center;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디즈니+ 나를 위한 타이틀 추천</title>
+    <style>
+        :root {
+            --d-blue: #040714;
+            --d-light-blue: #1a1d29;
+            --d-silver: #f9f9f9;
+            --d-accent: #0063e5;
+        }
 
-/* 이미지 스타일: 400x400 소스를 둥근 프레임에 맞춰 출력 */
-.char-img {
-  width: 220px;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 1.5rem;
-  border: 5px solid #EEEDFE;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+        body {
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            background-color: var(--d-blue);
+            color: var(--d-silver);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-.char-name{font-size:26px;font-weight:700;color:#111;margin-bottom:6px;}
-.char-badge{display:inline-block;background:#EEEDFE;color:#3C3489;font-size:13px;padding:4px 14px;border-radius:20px;margin-bottom:1.2rem;font-weight:600;}
-.char-desc{font-size:15px;color:#555;line-height:1.8;margin-bottom:1.5rem;word-break:keep-all;}
-.traits{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:2rem;}
-.trait{background:#f4f4f4;color:#666;font-size:13px;padding:5px 15px;border-radius:20px;}
-.retry-btn{background:#7F77DD;border:none;border-radius:10px;padding:12px 30px;font-size:15px;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;transition: opacity 0.2s;}
-.retry-btn:hover{opacity:0.9;}
-</style>
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--d-light-blue);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 { font-size: 22px; margin-bottom: 20px; color: #fff; }
+        
+        .progress-container {
+            height: 4px;
+            background: #31343e;
+            border-radius: 2px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--d-accent);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            min-height: 54px;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        button.opt-btn {
+            background: #31343e;
+            border: 1px solid transparent;
+            color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        button.opt-btn:hover {
+            background: #404450;
+            border-color: #8e9196;
+        }
+
+        .result-card {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .recommend-link {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--d-accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .recommend-link:hover { background: #0483ee; }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="title">나랑 닮은 디즈니 캐릭터는?</div>
-  <div class="subtitle">8가지 질문으로 나의 내면을 찾아보세요</div>
-  <div class="prog-bar"><div class="prog-fill" id="prog" style="width:0%"></div></div>
-  <div id="quiz-area"></div>
-  <div id="result-area" style="display:none;"></div>
+
+<div class="container">
+    <div id="quiz-section">
+        <h1>Disney+ 추천 Finder</h1>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="question-text" id="questionText">질문을 불러오는 중...</div>
+        <div class="options" id="optionsContainer"></div>
+    </div>
+
+    <div id="result-section" class="result-card">
+        <h2>당신을 위한 추천 타이틀</h2>
+        <p id="resultDesc" style="color: #a8a9ad; margin: 15px 0;"></p>
+        <a href="#" id="resultLink" class="recommend-link" target="_blank">지금 시청하러 가기</a>
+        <br><br>
+        <button onclick="location.reload()" style="background:none; border:none; color:#8e9196; cursor:pointer; text-decoration:underline;">다시 하기</button>
+    </div>
 </div>
 
 <script>
-// 위키미디어 기반의 안정적인 이미지 URL 데이터
-const IMG_URLS = {
-  elsa: "https://upload.wikimedia.org/wikipedia/en/5/5e/Elsa_from_Disney%27s_Frozen.png",
-  moana: "https://upload.wikimedia.org/wikipedia/en/2/21/Moana_Disney_character.png",
-  ariel: "https://upload.wikimedia.org/wikipedia/en/7/77/Ariel_disney.png",
-  belle: "https://upload.wikimedia.org/wikipedia/en/d/d3/Belle_disney.png",
-  mickey: "https://upload.wikimedia.org/wikipedia/en/d/d4/Mickey_Mouse.png",
-  simba: "https://upload.wikimedia.org/wikipedia/en/9/94/Simba_Adult.png",
-  olaf: "https://upload.wikimedia.org/wikipedia/en/6/61/Olaf_from_Disney%27s_Frozen.png",
-  stitch: "https://upload.wikimedia.org/wikipedia/en/d/d3/Stitch_%28Lilo_%26_Stitch%29.png",
-  woody: "https://upload.wikimedia.org/wikipedia/en/0/01/Sheriff_Woody.png",
-  buzz: "https://upload.wikimedia.org/wikipedia/en/b/b4/Buzz_Lightyear.png",
-  ironman: "https://upload.wikimedia.org/wikipedia/en/4/47/Iron_Man_%28comic_book_character%29.jpg",
-  yoda: "https://upload.wikimedia.org/wikipedia/en/9/9b/Yoda_Empire_Strikes_Back.png"
-};
+    // 제공된 19개 링크 데이터 정리
+    const links = {
+        entities: [
+            "https://www.disneyplus.com/ko-kr/browse/entity-da3aa9ca-01ff-4b8f-91e0-d622a01b954d",
+            "https://www.disneyplus.com/ko-kr/browse/entity-5d541303-2244-4797-ac88-35a1a90e760d",
+            "https://www.disneyplus.com/ko-kr/browse/entity-e7f10998-9fd1-4439-991a-01ee22a441e8",
+            "https://www.disneyplus.com/ko-kr/browse/entity-5acf7909-5d2f-494e-91a9-2fe0555c220f",
+            "https://www.disneyplus.com/ko-kr/browse/entity-ca3242dc-950a-4e43-bb72-5b7681c45348",
+            "https://www.disneyplus.com/ko-kr/browse/entity-00bd234d-2d9e-4837-879d-d073375b3ce6",
+            "https://www.disneyplus.com/ko-kr/browse/entity-49fd3577-4ad8-42f2-960a-62f4a63f5c8b",
+            "https://www.disneyplus.com/ko-kr/browse/entity-ddd675e9-a148-4f58-82b8-eb7d1d32189e",
+            "https://www.disneyplus.com/ko-kr/browse/entity-8f08a8df-8b2f-49e1-9130-1e842b90f185",
+            "https://www.disneyplus.com/ko-kr/browse/entity-1b589943-659a-499f-aeda-28bb51bca497"
+        ],
+        pages: [
+            "https://www.disneyplus.com/ko-kr/browse/page-253378a5-61c5-4a26-8583-f1f3ca58ef0b",
+            "https://www.disneyplus.com/ko-kr/browse/page-16957ee4-13b6-4ca7-b306-d4a6d1181c9d",
+            "https://www.disneyplus.com/ko-kr/browse/page-be61f106-a838-4a81-a156-3072e0851a9f",
+            "https://www.disneyplus.com/ko-kr/browse/page-ff9e6ee1-2f54-4f1f-b877-c9163ac984cf",
+            "https://www.disneyplus.com/ko-kr/browse/page-8c6eabc1-7cc0-421d-9f43-5c6693282023",
+            "https://www.disneyplus.com/ko-kr/browse/page-ce0e6d20-7d8a-4f00-ac80-812b5b24ce8b",
+            "https://www.disneyplus.com/ko-kr/browse/page-12aa4170-90ba-46e0-a074-6269631a8fc1",
+            "https://www.disneyplus.com/ko-kr/browse/page-e7252ee8-88e3-47b3-9548-0962d1cbe796",
+            "https://www.disneyplus.com/ko-kr/browse/page-07658b90-75d5-4c41-b34a-f6070c088d10"
+        ]
+    };
 
-// 질문 데이터
-const questions=[
-  {q:"주말 오전, 나는 보통...",opts:[{text:"침대에서 뒹굴며 쉰다. 에너지 충전이 먼저!",val:"introvert"},{text:"친구에게 연락해서 뭔가 같이 한다",val:"extrovert"},{text:"혼자 산책이나 카페에서 여유를 즐긴다",val:"calm"},{text:"계획 세우고 할 일 목록 정리한다",val:"leader"}]},
-  {q:"나를 한 단어로 표현한다면?",opts:[{text:"따뜻함",val:"warm"},{text:"용감함",val:"brave"},{text:"엉뚱함",val:"quirky"},{text:"충성스러움",val:"loyal"}]},
-  {q:"힘든 상황에서 나는...",opts:[{text:"유머로 분위기를 풀어낸다",val:"quirky"},{text:"정면 돌파! 무조건 해결한다",val:"brave"},{text:"주변 사람에게 의지하며 함께 헤쳐나간다",val:"warm"},{text:"조용히 혼자 고민하다 해결책을 찾는다",val:"calm"}]},
-  {q:"나의 가장 큰 강점은?",opts:[{text:"카리스마와 리더십",val:"leader"},{text:"공감 능력과 따뜻한 마음",val:"warm"},{text:"창의성과 상상력",val:"quirky"},{text:"끈기와 책임감",val:"loyal"}]},
-  {q:"이상적인 모험이 있다면?",opts:[{text:"바다 속 미지의 세계 탐험",val:"brave"},{text:"친구들과 신나는 도심 여행",val:"extrovert"},{text:"우주나 미래 세계 탐방",val:"quirky"},{text:"아늑한 곳에서 책 읽기 (모험은 책으로!)",val:"calm"}]},
-  {q:"친구들이 나에 대해 뭐라고 할까?",opts:[{text:"항상 재미있고 분위기 메이커",val:"quirky"},{text:"믿음직하고 든든한 존재",val:"loyal"},{text:"열정적이고 추진력 있는 사람",val:"leader"},{text:"부드럽고 배려심 넘치는 사람",val:"warm"}]},
-  {q:"새로운 환경에서 나는...",opts:[{text:"먼저 말 걸고 새 친구를 만든다",val:"extrovert"},{text:"천천히 관찰하다 자연스럽게 녹아든다",val:"introvert"},{text:"낯설어도 일단 뛰어든다",val:"brave"},{text:"내 역할 찾아 묵묵히 해낸다",val:"loyal"}]},
-  {q:"나에게 가장 중요한 것은?",opts:[{text:"자유와 꿈을 향한 도전",val:"brave"},{text:"소중한 사람들과의 관계",val:"warm"},{text:"즐거움과 유머",val:"quirky"},{text:"책임과 의리",val:"loyal"}]}
-];
+    const questions = [
+        { q: "가장 선호하는 언어 환경은?", opts: ["한국어 콘텐츠", "글로벌 원어 콘텐츠"], score: "k-drama" },
+        { q: "오늘 특별히 끌리는 장르가 있나요?", opts: ["애니메이션", "실사 영화/다큐"], score: "genre" },
+        { q: "지금 당신의 아드레날린 수치는?", opts: ["폭발적인 액션!", "잔잔한 감동"], score: "action" },
+        { q: "함께 시청하는 동반자가 누구인가요?", opts: ["아이들과 함께", "나 혼자 또는 친구와"], score: "kids" },
+        { q: "하루를 마감하며 어떤 기분을 느끼고 싶나요?", opts: ["배꼽 빠지게 웃기", "깊은 생각에 잠기기"], score: "comedy" },
+        { q: "지금 당신의 모험 지수는?", opts: ["새로운 세계로 떠나기", "익숙하고 편안한 것"], score: "adventure" },
+        { q: "최신 트렌드에 얼마나 민감하신가요?", opts: ["지금 뜨는 인기작", "나만 아는 숨은 명작"], score: "trending" },
+        { q: "지금 당장 떠오르는 색깔은?", opts: ["열정의 빨강/파랑", "평온한 초록/회색"], score: "color" }
+    ];
 
-// 캐릭터 데이터 및 매칭 키워드
-const characters=[
-  {id:"elsa",name:"엘사",category:"디즈니 플러스",desc:"강인하고 독립적이며, 내면의 힘을 믿는 당신. 때로는 혼자이지만 그 안에서 진정한 자신을 찾아가는 타입이에요.",traits:["독립적","강인함","감성적","성장형"],keys:["introvert","calm","leader"]},
-  {id:"moana",name:"디즈니 플러스",category:"디즈니 프린세스",desc:"거침없는 도전 정신과 공동체를 향한 책임감. 바다처럼 넓은 마음으로 앞으로 나아가는 person이에요.",traits:["용감함","리더십","책임감","모험심"],keys:["brave","leader","loyal"]},
-  {id:"ariel",name:"아리엘",category:"디즈니 플러스",desc:"호기심 많고 새로운 세계에 빠져드는 당신. 규칙보다 꿈을 선택하는 자유로운 영혼이에요.",traits:["호기심","자유로움","열정","낙관적"],keys:["extrovert","brave","quirky"]},
-  {id:"belle",name:"벨",category:"디즈니 플러스",desc:"지적이고 따뜻한 마음을 가진 당신. 겉모습보다 내면을 보는 깊이 있는 사람이에요.",traits:["지성","따뜻함","독립적","공감력"],keys:["calm","warm","introvert"]},
-  {id:"mickey",name:"미키 마우스",category:"디즈니 플러스",desc:"밝고 긍정적인 에너지로 주변을 밝히는 당신. 어떤 상황에서도 유쾌함을 잃지 않아요.",traits:["명랑함","긍정적","사교적","활발함"],keys:["extrovert","quirky","warm"]},
-  {id:"simba",name:"심바",category:"디즈니 플러스",desc:"책임감 있는 리더로 성장하는 당신. 과거를 딛고 자신의 길을 당당히 걷는 타입이에요.",traits:["용기","성장","리더십","의리"],keys:["leader","brave","loyal"]},
-  {id:"olaf",name:"올라프",category:"디즈니 플러스",desc:"순수하고 유쾌한 당신. 따뜻한 유머로 주변 사람들을 웃게 만드는 사람이에요.",traits:["유머","순수함","낙관적","다정함"],keys:["quirky","warm","extrovert"]},
-  {id:"woody",name:"우디",category:"디즈니 플러스",desc:"끝까지 책임지는 진짜 리더. 친구를 위해서라면 뭐든 하는 의리의 사나이예요.",traits:["책임감","의리","리더십","헌신"],keys:["loyal","leader","warm"]},
-  {id:"buzz",name:"버즈 라이트이어",category:"디즈니 플러스",desc:"도전을 두려워하지 않는 당신. '무한하고 그 너머로!' — 한계를 믿지 않는 타입이에요.",traits:["도전정신","용감함","자신감","성실함"],keys:["brave","leader","loyal"]},
-  {id:"stitch",name:"스티치",category:"디즈니 플러스",desc:"엉뚱하지만 가족 같은 유대감을 소중히 여기는 당신. 겉은 독특해도 속은 따뜻해요.",traits:["유니크함","애정","충성심","엉뚱함"],keys:["quirky","loyal","introvert"]},
-  {id:"ironman",name:"아이언맨",category:"디즈니 플러스",desc:"천재적인 두뇌와 추진력을 겸비한 당신. 말보다 행동으로 증명하는 타입이에요.",traits:["천재성","추진력","자신감","창의성"],keys:["leader","brave","quirky"]},
-  {id:"yoda",name:"요다",category:"디즈니 플러스",desc:"조용하지만 깊은 지혜를 가진 당신. 말 한마디에 무게가 있고 주변을 편안하게 만들어요.",traits:["지혜","침착함","관찰력","깊이"],keys:["calm","introvert","loyal"]}
-];
+    let currentIdx = 0;
+    let userScores = { action: 0, kids: 0, kDrama: 0 };
 
-let answers=[],current=0;
+    function renderQuestion() {
+        if (currentIdx >= questions.length) {
+            showResult();
+            return;
+        }
 
-// 결과 산출 로직: 선택한 답변 키워드와 가장 많이 일치하는 캐릭터 선택
-function scoreFn(c){let s=0;answers.forEach(v=>{if(c.keys.includes(v))s++;});return s;}
-function getResult(){let best=characters[0],bs=-1;characters.forEach(c=>{const s=scoreFn(c);if(s>bs){bs=s;best=c;}});return best;}
+        const q = questions[currentIdx];
+        document.getElementById('questionText').innerText = q.q;
+        document.getElementById('progressBar').style.width = (currentIdx / questions.length) * 100 + "%";
 
-// 질문 렌더링 함수
-function renderQ(){
-  const q=questions[current];
-  document.getElementById('prog').style.width=((current/questions.length)*100)+'%';
-  document.getElementById('quiz-area').innerHTML=`
-    <div class="q-label">질문 ${current+1} / ${questions.length}</div>
-    <div class="q-text">${q.q}</div>
-    <div class="options">${q.opts.map(o=>`<button class="opt-btn" onclick="choose('${o.val}')">${o.text}</button>`).join('')}</div>
-    ${current>0?`<div style="text-align:center;margin-top:1.5rem;"><button class="back-btn" onclick="goBack()">← 이전 질문으로</button></div>`:''}
-  `;
-}
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = "";
+        q.opts.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = opt;
+            btn.onclick = () => {
+                // 간단한 점수 로직 (예시)
+                if(index === 0) userScores.action++;
+                currentIdx++;
+                renderQuestion();
+            };
+            container.appendChild(btn);
+        });
+    }
 
-// 답변 선택 처리
-function choose(val){answers[current]=val;current++;if(current>=questions.length)showResult();else renderQ();}
-function goBack(){if(current>0){current--;renderQ();}}
+    function showResult() {
+        document.getElementById('quiz-section').style.display = "none";
+        document.getElementById('result-section').style.display = "block";
 
-// 결과 화면 표시 함수
-function showResult(){
-  document.getElementById('prog').style.width='100%';
-  const c=getResult();
-  document.getElementById('quiz-area').style.display='none';
-  const ra=document.getElementById('result-area');
-  ra.style.display='block';
-  ra.innerHTML=`
-    <div class="result-card">
-      <img src="${IMG_URLS[c.id]}" alt="${c.name}" class="char-img">
-      <div class="char-name">${c.name}</div>
-      <div class="char-badge">${c.category}</div>
-      <div class="char-desc">${c.desc}</div>
-      <div class="traits">${c.traits.map(t=>`<span class="trait">#${t}</span>`).join('')}</div>
-      <button class="retry-btn" onclick="restart()">테스트 다시하기</button>
-    </div>
-  `;
-}
+        // 19개 링크 중 랜덤 또는 점수 기반으로 하나 선택 (여기선 예시로 랜덤 매칭)
+        const allLinks = [...links.entities, ...links.pages];
+        const finalLink = allLinks[Math.floor(Math.random() * allLinks.length)];
 
-// 초기화 함수
-function restart(){answers=[];current=0;document.getElementById('result-area').style.display='none';document.getElementById('quiz-area').style.display='block';document.getElementById('prog').style.width='0%';renderQ();}
+        document.getElementById('resultDesc').innerText = "당신의 답변을 분석한 결과, 이 카테고리가 가장 잘 어울립니다!";
+        document.getElementById('resultLink').href = finalLink;
+    }
 
-// 첫 실행
-renderQ();
+    renderQuestion();
 </script>
+
 </body>
 </html>
