@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>디즈니+ 나를 위한 타이틀 추천</title>
+    <title>Disney+ Title Finder</title>
     <style>
         :root {
             --d-blue: #040714;
@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'Apple SD Gothic Neo', sans-serif;
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
             background-color: var(--d-blue);
             color: var(--d-silver);
             display: flex;
@@ -21,86 +21,121 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             background: var(--d-light-blue);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             text-align: center;
+            position: relative;
         }
 
-        h1 { font-size: 22px; margin-bottom: 20px; color: #fff; }
+        h1 { font-size: 24px; margin-bottom: 24px; color: #fff; letter-spacing: -0.5px; }
         
+        /* 상단 진행 바 */
         .progress-container {
             height: 4px;
             background: #31343e;
             border-radius: 2px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .progress-bar {
             height: 100%;
             background: var(--d-accent);
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .question-text {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            line-height: 1.5;
-            min-height: 54px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            min-height: 64px;
+            word-break: keep-all;
         }
 
         .options {
             display: grid;
-            gap: 12px;
+            gap: 14px;
         }
 
         button.opt-btn {
             background: #31343e;
-            border: 1px solid transparent;
+            border: 1px solid rgba(255,255,255,0.1);
             color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 18px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 15px;
-            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
             text-align: center;
         }
 
         button.opt-btn:hover {
             background: #404450;
-            border-color: #8e9196;
+            border-color: var(--d-accent);
+            transform: translateY(-2px);
         }
 
-        .result-card {
+        /* 파란 물결 로딩 섹션 */
+        #loading-section {
             display: none;
-            animation: fadeIn 0.5s ease-in-out;
+            padding: 40px 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .wave-box {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+            background: rgba(0, 99, 229, 0.1);
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--d-accent);
         }
 
-        .recommend-link {
-            display: inline-block;
-            margin-top: 20px;
+        .wave {
+            position: absolute;
+            top: 100%; /* 아래에서 시작 */
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: var(--d-accent);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
+            border-radius: 38%;
+            animation: wave-move 5s linear infinite, wave-rise 5s linear forwards;
+            opacity: 0.8;
         }
 
-        .recommend-link:hover { background: #0483ee; }
+        .wave:nth-child(2) {
+            animation: wave-move 7s linear infinite reverse, wave-rise 5s linear forwards;
+            opacity: 0.5;
+            background: #0483ee;
+        }
+
+        @keyframes wave-move {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes wave-rise {
+            0% { top: 100%; }
+            100% { top: -20%; }
+        }
+
+        .loading-msg {
+            margin-top: 25px;
+            font-size: 17px;
+            color: #a8a9ad;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -111,64 +146,59 @@
         <div class="progress-container">
             <div class="progress-bar" id="progressBar"></div>
         </div>
-        <div class="question-text" id="questionText">질문을 불러오는 중...</div>
+        <div class="question-text" id="questionText">질문을 준비 중입니다...</div>
         <div class="options" id="optionsContainer"></div>
     </div>
 
-    <div id="result-section" class="result-card">
-        <h2>당신을 위한 추천 타이틀</h2>
-        <p id="resultDesc" style="color: #a8a9ad; margin: 15px 0;"></p>
-        <a href="#" id="resultLink" class="recommend-link" target="_blank">지금 시청하러 가기</a>
-        <br><br>
-        <button onclick="location.reload()" style="background:none; border:none; color:#8e9196; cursor:pointer; text-decoration:underline;">다시 하기</button>
+    <div id="loading-section">
+        <div class="wave-box">
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+        <div class="loading-msg">당신의 취향을 분석하고 있습니다...</div>
     </div>
 </div>
 
 <script>
-    // 제공된 19개 링크 데이터 정리
-    const links = {
-        entities: [
-            "https://www.disneyplus.com/ko-kr/browse/entity-da3aa9ca-01ff-4b8f-91e0-d622a01b954d",
-            "https://www.disneyplus.com/ko-kr/browse/entity-5d541303-2244-4797-ac88-35a1a90e760d",
-            "https://www.disneyplus.com/ko-kr/browse/entity-e7f10998-9fd1-4439-991a-01ee22a441e8",
-            "https://www.disneyplus.com/ko-kr/browse/entity-5acf7909-5d2f-494e-91a9-2fe0555c220f",
-            "https://www.disneyplus.com/ko-kr/browse/entity-ca3242dc-950a-4e43-bb72-5b7681c45348",
-            "https://www.disneyplus.com/ko-kr/browse/entity-00bd234d-2d9e-4837-879d-d073375b3ce6",
-            "https://www.disneyplus.com/ko-kr/browse/entity-49fd3577-4ad8-42f2-960a-62f4a63f5c8b",
-            "https://www.disneyplus.com/ko-kr/browse/entity-ddd675e9-a148-4f58-82b8-eb7d1d32189e",
-            "https://www.disneyplus.com/ko-kr/browse/entity-8f08a8df-8b2f-49e1-9130-1e842b90f185",
-            "https://www.disneyplus.com/ko-kr/browse/entity-1b589943-659a-499f-aeda-28bb51bca497"
-        ],
-        pages: [
-            "https://www.disneyplus.com/ko-kr/browse/page-253378a5-61c5-4a26-8583-f1f3ca58ef0b",
-            "https://www.disneyplus.com/ko-kr/browse/page-16957ee4-13b6-4ca7-b306-d4a6d1181c9d",
-            "https://www.disneyplus.com/ko-kr/browse/page-be61f106-a838-4a81-a156-3072e0851a9f",
-            "https://www.disneyplus.com/ko-kr/browse/page-ff9e6ee1-2f54-4f1f-b877-c9163ac984cf",
-            "https://www.disneyplus.com/ko-kr/browse/page-8c6eabc1-7cc0-421d-9f43-5c6693282023",
-            "https://www.disneyplus.com/ko-kr/browse/page-ce0e6d20-7d8a-4f00-ac80-812b5b24ce8b",
-            "https://www.disneyplus.com/ko-kr/browse/page-12aa4170-90ba-46e0-a074-6269631a8fc1",
-            "https://www.disneyplus.com/ko-kr/browse/page-e7252ee8-88e3-47b3-9548-0962d1cbe796",
-            "https://www.disneyplus.com/ko-kr/browse/page-07658b90-75d5-4c41-b34a-f6070c088d10"
-        ]
-    };
+    // 19개의 디즈니+ 엔티티 및 페이지 링크
+    const RECOMMEND_LINKS = [
+        "https://www.disneyplus.com/ko-kr/browse/entity-da3aa9ca-01ff-4b8f-91e0-d622a01b954d",
+        "https://www.disneyplus.com/ko-kr/browse/entity-5d541303-2244-4797-ac88-35a1a90e760d",
+        "https://www.disneyplus.com/ko-kr/browse/entity-e7f10998-9fd1-4439-991a-01ee22a441e8",
+        "https://www.disneyplus.com/ko-kr/browse/entity-5acf7909-5d2f-494e-91a9-2fe0555c220f",
+        "https://www.disneyplus.com/ko-kr/browse/entity-ca3242dc-950a-4e43-bb72-5b7681c45348",
+        "https://www.disneyplus.com/ko-kr/browse/entity-00bd234d-2d9e-4837-879d-d073375b3ce6",
+        "https://www.disneyplus.com/ko-kr/browse/entity-49fd3577-4ad8-42f2-960a-62f4a63f5c8b",
+        "https://www.disneyplus.com/ko-kr/browse/entity-ddd675e9-a148-4f58-82b8-eb7d1d32189e",
+        "https://www.disneyplus.com/ko-kr/browse/entity-8f08a8df-8b2f-49e1-9130-1e842b90f185",
+        "https://www.disneyplus.com/ko-kr/browse/entity-1b589943-659a-499f-aeda-28bb51bca497",
+        "https://www.disneyplus.com/ko-kr/browse/page-253378a5-61c5-4a26-8583-f1f3ca58ef0b",
+        "https://www.disneyplus.com/ko-kr/browse/page-16957ee4-13b6-4ca7-b306-d4a6d1181c9d",
+        "https://www.disneyplus.com/ko-kr/browse/page-be61f106-a838-4a81-a156-3072e0851a9f",
+        "https://www.disneyplus.com/ko-kr/browse/page-ff9e6ee1-2f54-4f1f-b877-c9163ac984cf",
+        "https://www.disneyplus.com/ko-kr/browse/page-8c6eabc1-7cc0-421d-9f43-5c6693282023",
+        "https://www.disneyplus.com/ko-kr/browse/page-ce0e6d20-7d8a-4f00-ac80-812b5b24ce8b",
+        "https://www.disneyplus.com/ko-kr/browse/page-12aa4170-90ba-46e0-a074-6269631a8fc1",
+        "https://www.disneyplus.com/ko-kr/browse/page-e7252ee8-88e3-47b3-9548-0962d1cbe796",
+        "https://www.disneyplus.com/ko-kr/browse/page-07658b90-75d5-4c41-b34a-f6070c088d10"
+    ];
 
     const questions = [
-        { q: "가장 선호하는 언어 환경은?", opts: ["한국어 콘텐츠", "글로벌 원어 콘텐츠"], score: "k-drama" },
-        { q: "오늘 특별히 끌리는 장르가 있나요?", opts: ["애니메이션", "실사 영화/다큐"], score: "genre" },
-        { q: "지금 당신의 아드레날린 수치는?", opts: ["폭발적인 액션!", "잔잔한 감동"], score: "action" },
-        { q: "함께 시청하는 동반자가 누구인가요?", opts: ["아이들과 함께", "나 혼자 또는 친구와"], score: "kids" },
-        { q: "하루를 마감하며 어떤 기분을 느끼고 싶나요?", opts: ["배꼽 빠지게 웃기", "깊은 생각에 잠기기"], score: "comedy" },
-        { q: "지금 당신의 모험 지수는?", opts: ["새로운 세계로 떠나기", "익숙하고 편안한 것"], score: "adventure" },
-        { q: "최신 트렌드에 얼마나 민감하신가요?", opts: ["지금 뜨는 인기작", "나만 아는 숨은 명작"], score: "trending" },
-        { q: "지금 당장 떠오르는 색깔은?", opts: ["열정의 빨강/파랑", "평온한 초록/회색"], score: "color" }
+        { q: "가장 선호하는 언어 환경은?", opts: ["한국어 콘텐츠", "글로벌 원어 콘텐츠"] },
+        { q: "오늘 특별히 끌리는 장르가 있나요?", opts: ["애니메이션", "실사 영화/다큐"] },
+        { q: "지금 당신의 아드레날린 수치는?", opts: ["폭발적인 액션!", "잔잔한 감동"] },
+        { q: "함께 시청하는 동반자가 누구인가요?", opts: ["아이들과 함께", "나 혼자 또는 친구와"] },
+        { q: "오늘을 마감하며 어떤 기분을 느끼고 싶나요?", opts: ["배꼽 빠지게 웃기", "깊은 생각에 잠기기"] },
+        { q: "지금 당신의 모험 지수는?", opts: ["새로운 세계로 떠나기", "익숙하고 편안한 것"] },
+        { q: "최신 트렌드에 얼마나 민감하신가요?", opts: ["지금 뜨는 인기작", "나만 아는 숨은 명작"] },
+        { q: "지금 당장 떠오르는 색깔은?", opts: ["열정의 빨강/파랑", "평온한 초록/회색"] }
     ];
 
     let currentIdx = 0;
-    let userScores = { action: 0, kids: 0, kDrama: 0 };
 
     function renderQuestion() {
         if (currentIdx >= questions.length) {
-            showResult();
+            startLoading();
             return;
         }
 
@@ -178,13 +208,11 @@
 
         const container = document.getElementById('optionsContainer');
         container.innerHTML = "";
-        q.opts.forEach((opt, index) => {
+        q.opts.forEach((opt) => {
             const btn = document.createElement('button');
             btn.className = "opt-btn";
             btn.innerText = opt;
             btn.onclick = () => {
-                // 간단한 점수 로직 (예시)
-                if(index === 0) userScores.action++;
                 currentIdx++;
                 renderQuestion();
             };
@@ -192,16 +220,16 @@
         });
     }
 
-    function showResult() {
+    // 5초간 물결 로딩 후 자동 이동
+    function startLoading() {
         document.getElementById('quiz-section').style.display = "none";
-        document.getElementById('result-section').style.display = "block";
+        document.getElementById('loading-section').style.display = "block";
 
-        // 19개 링크 중 랜덤 또는 점수 기반으로 하나 선택 (여기선 예시로 랜덤 매칭)
-        const allLinks = [...links.entities, ...links.pages];
-        const finalLink = allLinks[Math.floor(Math.random() * allLinks.length)];
-
-        document.getElementById('resultDesc').innerText = "당신의 답변을 분석한 결과, 이 카테고리가 가장 잘 어울립니다!";
-        document.getElementById('resultLink').href = finalLink;
+        // 분석 애니메이션 종료 후 리다이렉트
+        setTimeout(() => {
+            const finalLink = RECOMMEND_LINKS[Math.floor(Math.random() * RECOMMEND_LINKS.length)];
+            window.location.href = finalLink;
+        }, 5000);
     }
 
     renderQuestion();
