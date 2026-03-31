@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disney+ Title Finder</title>
+    <title>디플 찐팬의 인생작 찾기 🏰</title>
     <style>
         :root {
             --d-blue: #040714;
@@ -29,35 +29,39 @@
             max-width: 480px;
             background: var(--d-light-blue);
             padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             text-align: center;
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.4s ease;
         }
 
-        h1 { font-size: 24px; margin-bottom: 24px; color: #fff; letter-spacing: -0.5px; }
+        .dimmed { opacity: 0; }
+
+        h1 { font-size: 20px; margin-bottom: 24px; color: #fff; letter-spacing: -0.5px; line-height: 1.4; }
         
-        /* 상단 진행 바 */
         .progress-container {
-            height: 4px;
+            height: 6px;
             background: #31343e;
-            border-radius: 2px;
+            border-radius: 3px;
             margin-bottom: 35px;
         }
 
         .progress-bar {
             height: 100%;
-            background: var(--d-accent);
+            background: linear-gradient(90deg, var(--d-accent), #00d4ff);
             width: 0%;
+            border-radius: 3px;
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .question-text {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 700;
             margin-bottom: 30px;
             line-height: 1.6;
-            min-height: 64px;
+            min-height: 70px;
             word-break: keep-all;
         }
 
@@ -70,83 +74,66 @@
             background: #31343e;
             border: 1px solid rgba(255,255,255,0.1);
             color: #f9f9f9;
-            padding: 18px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.2s ease;
-            text-align: center;
         }
 
         button.opt-btn:hover {
-            background: #404450;
-            border-color: var(--d-accent);
-            transform: translateY(-2px);
+            background: var(--d-accent);
+            border-color: #fff;
+            transform: scale(1.02);
         }
 
-        /* 파란 물결 로딩 섹션 */
-        #loading-section {
-            display: none;
-            padding: 40px 0;
-        }
+        #loading-section { display: none; padding: 40px 0; }
 
         .wave-box {
-            position: relative;
-            width: 160px;
-            height: 160px;
-            margin: 0 auto;
-            background: rgba(0, 99, 229, 0.1);
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid var(--d-accent);
+            position: relative; width: 160px; height: 160px;
+            margin: 0 auto; background: rgba(0, 99, 229, 0.1);
+            border-radius: 50%; overflow: hidden; border: 4px solid var(--d-accent);
         }
 
         .wave {
-            position: absolute;
-            top: 100%; /* 아래에서 시작 */
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: var(--d-accent);
-            border-radius: 38%;
+            position: absolute; top: 100%; left: -50%; width: 200%; height: 200%;
+            background: var(--d-accent); border-radius: 38%;
             animation: wave-move 5s linear infinite, wave-rise 5s linear forwards;
             opacity: 0.8;
         }
 
         .wave:nth-child(2) {
             animation: wave-move 7s linear infinite reverse, wave-rise 5s linear forwards;
-            opacity: 0.5;
-            background: #0483ee;
+            opacity: 0.5; background: #0483ee;
         }
 
-        @keyframes wave-move {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes wave-move { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes wave-rise { 0% { top: 100%; } 100% { top: -20%; } }
 
-        @keyframes wave-rise {
-            0% { top: 100%; }
-            100% { top: -20%; }
-        }
-
-        .loading-msg {
-            margin-top: 25px;
-            font-size: 17px;
-            color: #a8a9ad;
-            font-weight: 500;
+        .loading-msg { margin-top: 25px; font-size: 18px; color: #fff; font-weight: 600; }
+        .loading-sub { margin-top: 10px; font-size: 14px; color: #a8a9ad; }
+        
+        /* 몰래 숨겨둔 텍스트 스타일 */
+        .hidden-hiring {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.05); /* 거의 안 보이게 설정 */
+            user-select: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
     <div id="quiz-section">
-        <h1>Disney+ 추천 Finder</h1>
+        <h1 id="mainTitle">🎬 디플만 5년 판 찐팬이<br>추천하는 취향 저격 타이틀</h1>
         <div class="progress-container">
             <div class="progress-bar" id="progressBar"></div>
         </div>
-        <div class="question-text" id="questionText">질문을 준비 중입니다...</div>
+        <div class="question-text" id="questionText">분석 준비 중... ⌛</div>
         <div class="options" id="optionsContainer"></div>
     </div>
 
@@ -155,12 +142,14 @@
             <div class="wave"></div>
             <div class="wave"></div>
         </div>
-        <div class="loading-msg">당신의 취향을 분석하고 있습니다...</div>
+        <div class="loading-msg" id="loadingMsg">멀티버스에서 취향 찾는 중... 📡</div>
+        <div class="loading-sub" id="loadingSub">미키 마우스가 서버실에서 뛰고 있어요 🐭⚙️</div>
     </div>
+    
+    <div class="hidden-hiring">디즈니 마케팅팀 보고 있나요? 채용 문의 환영합니다!</div>
 </div>
 
 <script>
-    // 19개의 디즈니+ 엔티티 및 페이지 링크
     const RECOMMEND_LINKS = [
         "https://www.disneyplus.com/ko-kr/browse/entity-da3aa9ca-01ff-4b8f-91e0-d622a01b954d",
         "https://www.disneyplus.com/ko-kr/browse/entity-5d541303-2244-4797-ac88-35a1a90e760d",
@@ -184,14 +173,18 @@
     ];
 
     const questions = [
-        { q: "가장 선호하는 언어 환경은?", opts: ["한국어 콘텐츠", "글로벌 원어 콘텐츠"] },
-        { q: "오늘 특별히 끌리는 장르가 있나요?", opts: ["애니메이션", "실사 영화/다큐"] },
-        { q: "지금 당신의 아드레날린 수치는?", opts: ["폭발적인 액션!", "잔잔한 감동"] },
-        { q: "함께 시청하는 동반자가 누구인가요?", opts: ["아이들과 함께", "나 혼자 또는 친구와"] },
-        { q: "오늘을 마감하며 어떤 기분을 느끼고 싶나요?", opts: ["배꼽 빠지게 웃기", "깊은 생각에 잠기기"] },
-        { q: "지금 당신의 모험 지수는?", opts: ["새로운 세계로 떠나기", "익숙하고 편안한 것"] },
-        { q: "최신 트렌드에 얼마나 민감하신가요?", opts: ["지금 뜨는 인기작", "나만 아는 숨은 명작"] },
-        { q: "지금 당장 떠오르는 색깔은?", opts: ["열정의 빨강/파랑", "평온한 초록/회색"] }
+        { q: "🌏 어떤 언어의 매력을 더 느끼고 싶나요?", opts: ["찰진 한국어 콘텐츠 🇰🇷", "현지 느낌 그대로 원어 🇺🇸"] },
+        { q: "🎨 오늘의 시각적 취향은 어떤가요?", opts: ["상상력 끝판왕 애니메이션 🧸", "리얼리티 가득한 실사/다큐 📽️"] },
+        { q: "💪 지금 가슴 속에 품고 있는 대사는?", opts: ["\"I am Iron Man\" (히어로 액션) 💥", "\"Remember who you are\" (감동 클래식) 🦁"] },
+        { q: "👨‍👩‍👧‍👦 누구와 함께 시청하시나요?", opts: ["아이들과 평화로운 시간 👼", "혼맥하며 즐기는 어른들의 시간 🍺"] },
+        { q: "🪐 모험을 떠난다면 어디로 가고 싶나요?", opts: ["\"To Infinity and Beyond!\" (우주/SF) 🚀", "마법이 흐르는 신비로운 숲 (판타지) 🪄"] },
+        { q: "🌙 오늘 밤, 당신의 감정 상태는?", opts: ["웃다가 배꼽 빠질 준비 완료 😂", "카타르시스 느끼며 오열 준비 완료 🧠"] },
+        { q: "⚔️ 포스가 당신과 함께하길 바라나요?", opts: ["\"May the Force be with you\" (스타워즈) ✨", "포스보단 마법의 주문이 좋아 (디즈니) 🧚"] },
+        { q: "🔥 유행의 중심에 서고 싶으신가요?", opts: ["지금 가장 핫한 인기작 🔝", "찐팬들만 아는 숨은 명작 💎"] },
+        { q: "🦸 히어로가 된다면 어떤 타입인가요?", opts: ["슈트 빨! 장비 빨! 추진력 갑 🦾", "묵묵히 세상을 지키는 정의감 🛡️"] },
+        { q: "🍕 야식으로 선택하고 싶은 메뉴는?", opts: ["피자 행성의 페퍼로니 피자 🍕", "라따뚜이가 만든 고급 요리 🥘"] },
+        { q: "⏳ 시간이동을 할 수 있다면?", opts: ["미래의 최첨단 기술 구경 🤖", "과거의 낭만과 클래식 감성 📻"] },
+        { q: "🌈 마지막으로, 지금 끌리는 에너지는?", opts: ["폭발적인 레드 & 블루 🔴🔵", "차분한 그린 & 화이트 🟢⚪"] }
     ];
 
     let currentIdx = 0;
@@ -202,38 +195,61 @@
             return;
         }
 
+        const container = document.getElementById('mainContainer');
         const q = questions[currentIdx];
-        document.getElementById('questionText').innerText = q.q;
-        document.getElementById('progressBar').style.width = (currentIdx / questions.length) * 100 + "%";
 
-        const container = document.getElementById('optionsContainer');
-        container.innerHTML = "";
-        q.opts.forEach((opt) => {
-            const btn = document.createElement('button');
-            btn.className = "opt-btn";
-            btn.innerText = opt;
-            btn.onclick = () => {
-                currentIdx++;
-                renderQuestion();
-            };
-            container.appendChild(btn);
-        });
+        container.classList.add('dimmed');
+
+        setTimeout(() => {
+            document.getElementById('questionText').innerText = q.q;
+            document.getElementById('progressBar').style.width = (currentIdx / questions.length) * 100 + "%";
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = "";
+            q.opts.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "opt-btn";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    currentIdx++;
+                    renderQuestion();
+                };
+                optionsContainer.appendChild(btn);
+            });
+
+            container.classList.remove('dimmed');
+        }, 400); 
     }
 
-    // 5초간 물결 로딩 후 자동 이동
     function startLoading() {
         document.getElementById('quiz-section').style.display = "none";
         document.getElementById('loading-section').style.display = "block";
 
-        // 분석 애니메이션 종료 후 리다이렉트
+        const msgs = [
+            "아이언맨 슈트보다 꼼꼼하게 분석 중... 🛠️",
+            "엘사가 얼린 서버 녹이는 중... ❄️🔥",
+            "무료 구독권 주면 더 잘 만들 수 있는데... 🤫", // 깜짝 숨겨진 멘트
+            "ㅎㅎㅎ 디플 볼꺼 많아요~ 🏰✨", // 깜짝 숨겨진 멘트
+            "멀티버스에서 당신의 취향 찾는 중... 🌌"
+        ];
+        
+        let msgIdx = 0;
+        const msgInterval = setInterval(() => {
+            if (msgIdx < msgs.length) {
+                document.getElementById('loadingMsg').innerText = msgs[msgIdx];
+                msgIdx++;
+            } else {
+                clearInterval(msgInterval);
+            }
+        }, 1000);
+
         setTimeout(() => {
             const finalLink = RECOMMEND_LINKS[Math.floor(Math.random() * RECOMMEND_LINKS.length)];
             window.location.href = finalLink;
-        }, 5000);
+        }, 5200);
     }
 
     renderQuestion();
 </script>
-
 </body>
 </html>
